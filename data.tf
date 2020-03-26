@@ -15,6 +15,7 @@ data "aws_iam_policy_document" "workers_assume_role_policy" {
   }
 }
 
+
 data "aws_ami" "eks_worker" {
   filter {
     name   = "name"
@@ -101,7 +102,7 @@ data "template_file" "launch_template_userdata" {
   }
 }
 
-data "template_file" "workers_launch_template_mixed" {
+/*data "template_file" "workers_launch_template_mixed" {
   count    = "${var.worker_group_launch_template_mixed_count}"
   template = "${file("${path.module}/templates/userdata.sh.tpl")}"
 
@@ -114,7 +115,7 @@ data "template_file" "workers_launch_template_mixed" {
     bootstrap_extra_args = "${lookup(var.worker_groups_launch_template_mixed[count.index], "bootstrap_extra_args", local.workers_group_defaults["bootstrap_extra_args"])}"
     kubelet_extra_args   = "${lookup(var.worker_groups_launch_template_mixed[count.index], "kubelet_extra_args", local.workers_group_defaults["kubelet_extra_args"])}"
   }
-}
+}*/
 
 data "aws_iam_role" "custom_cluster_iam_role" {
   count = "${var.manage_cluster_iam_resources ? 0 : 1}"
@@ -131,7 +132,12 @@ data "aws_iam_instance_profile" "custom_worker_group_launch_template_iam_instanc
   name  = "${lookup(var.worker_groups_launch_template[count.index], "iam_instance_profile_name", local.workers_group_defaults["iam_instance_profile_name"])}"
 }
 
-data "aws_iam_instance_profile" "custom_worker_group_launch_template_mixed_iam_instance_profile" {
+/*data "aws_iam_instance_profile" "custom_worker_group_launch_template_mixed_iam_instance_profile" {
   count = "${var.manage_worker_iam_resources ? 0 : var.worker_group_launch_template_mixed_count}"
   name  = "${lookup(var.worker_groups_launch_template_mixed[count.index], "iam_instance_profile_name", local.workers_group_defaults["iam_instance_profile_name"])}"
+}*/
+
+# This is required for managed node_groups
+data "aws_availability_zones" "available" {
+  state = "available"
 }
